@@ -58,7 +58,50 @@ const homePageListing = async(req,res)=>{
   }
 }
 
-// ======= SAVE CHATS ==============================
+// ==========Function to save a new chat message ==========
+
+const saveChatMessage = async (message, chatId) => {
+  try {
+    await db.promise().query('INSERT INTO discussions (senderEmail, receiverEmail, message) VALUES (?, ?, ?)', [message.senderEmail, chatId, message.message]);
+    console.log('Chat message saved successfully');
+  } catch (error) {
+    console.error('Error saving chat message: ' + error.stack);
+    throw error;
+  }
+};
+
+// Function to get all chat messages between two users
+const getChatMessages = async (req, res) => {
+  try {
+    const {receiver,sender} = req.query
+    const [chatMessages] = await db.promise().query('SELECT * FROM discussions WHERE (senderEmail = ? AND receiverEmail = ?) OR (senderEmail = ? AND receiverEmail = ?) ORDER BY createdAt', [sender, receiver, receiver, sender]);
+    res.json({allMessages:chatMessages})
+  } catch (error) {
+    console.error('Error getting chat messages: ' + error.stack);
+    throw error;
+  }
+};
+
+// Controller function to delete a discussion and its messages
+const deleteDiscussion = async (req, res) => {
+  const {id} = req.query;
+  console.log(id)
+  try {
+    db.query('DELETE FROM discussions WHERE id = ?', [id], (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+      } else {
+        // console.log('Deleted discussion:', result);
+        res.status(200).json({ success: true, message: 'Discussion deleted successfully' });
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting discussion:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+};
 
 
-module.exports = { submitLogin,submitSignup,homePageListing };
+
+module.exports = { submitLogin,submitSignup,homePageListing,saveChatMessage,getChatMessages,deleteDiscussion};
