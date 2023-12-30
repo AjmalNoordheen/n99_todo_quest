@@ -4,7 +4,7 @@ const app = express();
 const baseRouter = require('./Routers/baseRouter');
 const db = require('./Model/db');
 const SocketIO = require('socket.io');
-const { saveChatMessage } = require('./Controllers/baseController');
+const { saveChatMessage, deleteDiscussion } = require('./Controllers/baseController');
 
 app.use(cors());
 app.use(express.json());
@@ -24,7 +24,6 @@ io.of('/chat').on("connection", (socket) => {
   console.log('Client connected:', socket.id);
    socket.on("setup", (chatId) => {
      socket.join(chatId);
-	console.log(chatId,'pppp')
   });
 
   socket.on("newMessage", (message, chatId) => {
@@ -32,9 +31,9 @@ io.of('/chat').on("connection", (socket) => {
     saveChatMessage(message, chatId);
   });
   
+  socket.on("deleteMessage",(message)=>{
+    io.of("/chat").emit("deleteResponce",message);
+    deleteDiscussion(message.index)
+  })
 
-
-  // socket.on("read", (timestamp, chatId,senderId) => {
-  // 	io.of("/chat").emit("readResponse", timestamp, chatId,senderId);
-  // });
 });
