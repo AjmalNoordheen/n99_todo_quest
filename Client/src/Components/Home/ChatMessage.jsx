@@ -4,8 +4,10 @@ import { IconButton } from "@mui/material";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 
 function ChatMessage({ email, sender, message, onDelete }) {
+
   return (
     <>
+
       {sender == email ? (
         <div className="col-start-7 col-end-13 p-3 rounded-lg">
           <div className="flex items-center justify-start flex-row-reverse">

@@ -49,16 +49,15 @@ function HomePage() {
     if (socket) {
       socket.emit("setup", receiver);
 
+ /*Responce message From the serverSide */
       socket.on("messageResponse", (message, receivedChatId) => {
-        console.log("received Message", message);                    /*Responce message From the serverSide */    
-        if (receiver === receivedChatId) {
+        if (receiver === receivedChatId || email === receivedChatId) {
           setRefresh(refresh + 1);
           setAllMessages((prevMessage) => [...prevMessage, message]);
         }
       });
     }
   }, [socket, receiver]);
-
   useEffect(() => {
     selectReceiver(receiver);
   }, [refresh]);
@@ -78,11 +77,10 @@ function HomePage() {
   };
 
   const sendMessage = async () => {
-    console.log(receiver);
     if (message.length > 0) {
       const newMessage = {
         message: message,              /*Sending message between users */
-        receiver: receiver,
+        receiverEmail: receiver,
         senderEmail: email,
         timestamp: Date.now(),
       };
@@ -166,13 +164,16 @@ function HomePage() {
               <>
                 {allMessages.length > 0 ? (
                   allMessages.map((message) => (
+
+                    <>
                     <ChatMessage
-                      key={message.id}
+                      key={message.message}
                       sender={message.senderEmail}
                       email={email}
                       message={message}
                       onDelete={() => handleDeleteMessage(message.id)}
                     />
+                    </>
                   ))
                 ) : (
                   <p>No messages</p>
