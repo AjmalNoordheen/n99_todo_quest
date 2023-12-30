@@ -50,7 +50,6 @@ function LoginPage() {
       if (passRegex.test(value)) {
         setPassvalid(true);
       } else {
-        console.log(value);
         if (value == "") {
           setPassvalid(null);
         } else {
