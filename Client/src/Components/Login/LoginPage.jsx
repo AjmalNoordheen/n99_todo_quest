@@ -17,6 +17,8 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const dispatch = useDispatch('')
 
+  const userAxios = axiosInstance()
+
   const location = useLocation().pathname;
   const navigate = useNavigate("");
   //======= EMAIL VALIDATION =========
@@ -74,7 +76,7 @@ function LoginPage() {
 
       const endpoint = location === "/signup" ? "/submitSignup" : "/submitLogin";
 
-      const res = await axiosInstance.post(endpoint, {
+      const res = await userAxios.post(endpoint, {
         email,
         password,
       });
@@ -83,7 +85,7 @@ function LoginPage() {
         ? location === "/signup"
           ? (toast.success("Successfully Registered. Login to continue"),
             navigate("/"))
-          : (toast.success("Successfully Logged-in"),dispatch(Login({email:email})),navigate("/home"))
+          : (toast.success("Successfully Logged-in"),dispatch(Login({email:email,token:res.data.token})),navigate("/home"))
         : toast.error(res.data.message);
     } catch (error) {
       console.error(error);

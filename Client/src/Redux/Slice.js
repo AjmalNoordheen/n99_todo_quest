@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   email: null,
+  token:null
 }
 
 export const baseSlice = createSlice({
@@ -10,9 +11,11 @@ export const baseSlice = createSlice({
   reducers: {
    Login:(state,action)=>{
         state.email = action.payload.email
+        state.token = action.payload.token
    },
    Logout:(state)=>{
     state.email = ''
+    state.token = ''
    }
   },
 })

@@ -22,9 +22,11 @@ function HomePage() {
   const dispatch = useDispatch();
   const navigate = useNavigate("");
   const messageHolder = useRef(null);
+  
+  const userAxios = axiosInstance()
 
   useEffect(() => {
-    axiosInstance.get("/homePageListing").then((res) => {
+    userAxios.get("/homePageListing").then((res) => {
       setUsers(res.data.users.filter((item) => item.email !== email)); /*homepage users listing */
     });
   }, [email]);
@@ -56,6 +58,15 @@ function HomePage() {
           setAllMessages((prevMessage) => [...prevMessage, message]);
         }
       });
+
+      socket.on("deleteResponce",(message)=>{
+        setAllMessages((prevMessages) =>
+        prevMessages.filter((item) => item.id !== message.index)
+      );
+      if(email==message.senderEmail)
+      toast.success('deleted successfully')
+        setRefresh(refresh + 1);    
+      })
     }
   }, [socket, receiver]);
   useEffect(() => {
@@ -65,7 +76,7 @@ function HomePage() {
   /*Fetching chats from the Server side When user click on the another users*/
   const selectReceiver = async (selectedReceiver) => {
     try {
-      const res = await axiosInstance.get(
+      const res = await userAxios.get(
         `/getChatMessages?receiver=${selectedReceiver}&&sender=${email}`   
       );                                                              
       setAllMessages(res.data.allMessages);
@@ -99,13 +110,13 @@ function HomePage() {
  /*For deleting the message of the sender only */
    const handleDeleteMessage = async (index) => {
     try {
-      const res = await axiosInstance.delete(`/deleteDiscussion?id=${index}`);
-      console.log("Delete response:", res.data);
-      if (res.status) {
-        toast.success("successfully deleted");
-        setAllMessages(allMessages.filter((item) => item.id !== index));
-      } else {
-        toast.error("unseccessfull");
+      if(index){
+        const deleteMessage = {
+          index:index,
+          senderEmail:email,
+          receiverEmail:receiver
+        }
+        socket.emit("deleteMessage",deleteMessage)
       }
     } catch (error) {
       console.log(error);
