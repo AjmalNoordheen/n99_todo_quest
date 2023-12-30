@@ -1,4 +1,4 @@
- import React from 'react';
+import React from 'react';
 import ChatListItem from './ChatListItem';
 
 function ChatList({ users, onSelect, lastMessages,setShowChatArea,showChatArea }) {
